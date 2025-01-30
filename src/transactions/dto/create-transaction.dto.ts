@@ -1,18 +1,19 @@
-import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsDateString, IsString } from 'class-validator';
 
 export class CreateTransactionDto {
-  @IsNumber()
-  user_id: number;
-
-  @IsEnum(['income', 'expense'])
-  type: 'income' | 'expense';
-
-  @IsString()
-  categoryName: string;
-
+  @IsNotEmpty()
   @IsNumber()
   amount: number;
 
-  @IsDate()
-  data: Date;
+  @IsNotEmpty()
+  @IsEnum(['expense', 'income'], { message: 'Transaction type must be either expense or income' })
+  transaction_type: string;
+
+  @IsNotEmpty()
+  @IsDateString()
+  date: Date;
+
+  @IsNotEmpty()
+  @IsString()
+  category_name: string;
 }

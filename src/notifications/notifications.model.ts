@@ -1,28 +1,31 @@
-import {
-  Table,
-  Model,
-  Column,
-  DataType,
-  AllowNull,
-} from 'sequelize-typescript';
+import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-@Table({ tableName: 'notifications' })
+@Table({
+  tableName: 'notifications',
+})
 export class Notifications extends Model<Notifications> {
-  @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  })
+  id: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
   })
   user_id: number;
 
-  @AllowNull(false)
   @Column({
     type: DataType.STRING,
+    allowNull: false,
   })
   message: string;
 
-  @AllowNull(false)
   @Column({
     type: DataType.BOOLEAN,
+    defaultValue: false,
   })
   is_read: boolean;
 }

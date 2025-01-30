@@ -16,15 +16,15 @@ export class Transactions extends Model<Transactions> {
 
   @AllowNull(false)
   @Column({
-    type: DataType.ENUM('income', 'expense'),
-  })
-  type: 'income' | 'expense';
-
-  @AllowNull(false) 
-  @Column({
     type: DataType.STRING,
   })
-  categoryName: string;
+  category_name: string;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.ENUM("expense", "income"),
+  })
+  transaction_type!: string;
 
   @AllowNull(false)
   @Column({
@@ -36,5 +36,5 @@ export class Transactions extends Model<Transactions> {
   @Column({
     type: DataType.DATE,
   })
-  data: Date;
+  date: Date;
 }

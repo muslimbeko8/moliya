@@ -21,12 +21,12 @@ export class AuthGuard implements CanActivate {
     const authHeader = request.headers['authorization'];
 
     if (!authHeader) {
-      throw new UnauthorizedException('Authorization kaliti berilmagan');
+      throw new UnauthorizedException('Authorization header is missing');
     }
 
     const token = authHeader.split(' ')[1];
     if (!token) {
-      throw new UnauthorizedException('JWT kaliti topilmadi');
+      throw new UnauthorizedException('JWT token is missing');
     }
 
     try {
@@ -35,29 +35,25 @@ export class AuthGuard implements CanActivate {
         this.configService.get('JWT_ACCESS_SECRET'),
       ) as jwt.JwtPayload;
 
-      if (!decodedToken.email) {
-        throw new UnauthorizedException('Yaroqsiz token');
+      if (!decodedToken.email || !decodedToken.userId) {
+        throw new UnauthorizedException('Invalid token');
       }
 
-      let user = null;
+      const user = await this.UserService.FindByEmail(decodedToken.email);
       if (!user) {
-        user = await this.UserService.FindByEmail(decodedToken.email);
-        if (!user) {
-          throw new UnauthorizedException('Foydalanuvchi topilmadi');
-        }
+        throw new UnauthorizedException('User not found');
       }
 
-    //   if (!user.is_active) {
-    //     throw new ForbiddenException(
-    //       'Sizning akkauntingiz tasdiqlanmagan. Iltimos, adminning tasdiqlashini kuting))',
-    //     );
-    //   }
+      // Add user details to the request for downstream processing
+      request.user = {
+        id: decodedToken.userId,
+        email: decodedToken.email,
+      };
 
-      request.user = decodedToken;
       return true;
     } catch (error) {
       if (error instanceof jwt.JsonWebTokenError) {
-        throw new UnauthorizedException('Yaroqsiz token');
+        throw new UnauthorizedException('Invalid token');
       }
 
       if (
@@ -67,7 +63,7 @@ export class AuthGuard implements CanActivate {
         throw error;
       }
 
-      throw new UnauthorizedException('Autentifikatsiya xatosi');
+      throw new UnauthorizedException('Authentication error');
     }
   }
 }

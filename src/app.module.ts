@@ -4,7 +4,6 @@ import { UsersModule } from './users/users.module';
 import { SharedModule } from './common/shared/shared.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { CategiesModule } from './categories/categories.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { NotificationsModule } from './notifications/notifications.module';
 
@@ -27,7 +26,6 @@ import { NotificationsModule } from './notifications/notifications.module';
       serveRoot: '/static',
     }),
     UsersModule,
-    CategiesModule,
     TransactionsModule,
     NotificationsModule,
   ],

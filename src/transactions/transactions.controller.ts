@@ -1,34 +1,68 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TransactionsService } from './transactions.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Patch,
+  UseGuards,
+  Req,
+  Query,
+} from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { TransactionsService } from './transactions.service';
+import { AuthGuard } from 'src/common/guard/auth.guard';
+import { Request } from 'express-serve-static-core';
+
 
 @Controller('transactions')
+@UseGuards(AuthGuard)
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
+  async create(@Req() req: Request, @Body() createTransactionDto: CreateTransactionDto) {
+    const userId = req.user.id; // Assuming `req.user` is populated by the AuthGuard
+    return this.transactionsService.create(userId, createTransactionDto);
   }
 
   @Get()
-  findAll() {
-    return this.transactionsService.findAll();
+  async findAll(@Req() req: Request) {
+    const userId = req.user.id;
+    return this.transactionsService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.transactionsService.findOne(+id);
+  async findOne(@Req() req: Request, @Param('id') id: number) {
+    const userId = req.user.id;
+    return this.transactionsService.findOne(userId, id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
-    return this.transactionsService.update(+id, updateTransactionDto);
+  async update(
+    @Req() req: Request,
+    @Param('id') id: number,
+    @Body() updateTransactionDto: UpdateTransactionDto,
+  ) {
+    const userId = req.user.id;
+    return this.transactionsService.update(userId, id, updateTransactionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.transactionsService.remove(+id);
+  async remove(@Req() req: Request, @Param('id') id: number) {
+    const userId = req.user.id;
+    return this.transactionsService.remove(userId, id);
+  }
+
+  @Get('daily-summary')
+  getDailySummary(@Query('userId') userId: number) {
+    return this.transactionsService.getDailySummary(userId);
+  }
+
+  @Get('monthly-summary')
+  getMonthlySummary(@Query('userId') userId: number) {
+    return this.transactionsService.getMonthlySummary(userId);
   }
 }
